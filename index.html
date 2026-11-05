@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moonshine Kaizen - Control de Producción e Inventario</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+</head>
+<body>
+
+  <!-- ============================================== -->
+  <!-- APLICACIÓN PRINCIPAL                           -->
+  <!-- ============================================== -->
+  <div class="app-container" id="app-container">
+    
+    <!-- Barra Lateral de Navegación -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">⚙️</div>
+        <div>
+          <div class="brand-title">MOONSHINE</div>
+          <div class="brand-subtitle">Producción & Inventario</div>
+        </div>
+      </div>
+
+      <ul class="nav-menu" id="sidebar-nav-menu">
+        <!-- 1. Modo Estación (Siempre accesible para operadores) -->
+        <li>
+          <a href="#" class="nav-link active" data-tab="station" id="nav-link-station">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            <span>Estación de Producción</span>
+          </a>
+        </li>
+
+        <!-- 2. Módulos de Administración (Desbloqueados con código 4125715) -->
+        <li class="admin-only-item" style="display:none;">
+          <a href="#" class="nav-link" data-tab="dashboard">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            <span>Tablero Principal</span>
+            <span class="nav-badge" id="sidebar-low-stock-badge" style="display:none;" title="Alertas de Stock Bajo">0</span>
+          </a>
+        </li>
+
+        <li class="admin-only-item" style="display:none;">
+          <a href="#" class="nav-link" data-tab="ledger">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+            <span>Libro de Producción</span>
+          </a>
+        </li>
+
+        <li class="admin-only-item" style="display:none;">
+          <a href="#" class="nav-link" data-tab="materials">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+            <span>Materia Prima</span>
+          </a>
+        </li>
+
+        <li class="admin-only-item" style="display:none;">
+          <a href="#" class="nav-link" data-tab="structures">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            <span>Estructuras & BOM</span>
+          </a>
+        </li>
+
+        <li class="admin-only-item" style="display:none;">
+          <a href="#" class="nav-link" data-tab="operators">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            <span>Lista de Operadores</span>
+          </a>
+        </li>
+
+        <li class="admin-only-item" style="display:none;">
+          <a href="#" class="nav-link" data-tab="audit">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>Historial Auditoría</span>
+          </a>
+        </li>
+
+        <!-- Botón para solicitar acceso administrador desde la barra si está en modo operador -->
+        <li id="sidebar-admin-login-btn">
+          <a href="#" class="nav-link" onclick="window.MoonshineApp.openAdminAuthModal(); return false;" style="color:var(--accent);">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            <span>Acceso Administrador</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- Footer de Barra Lateral (Solo visible para Admin) -->
+      <div class="sidebar-footer admin-only-item" style="display:none;">
+        <div style="font-weight:600; color:#cbd5e1; margin-bottom: 0.25rem;">Gestión de Datos</div>
+        <div class="sidebar-btn-group">
+          <button class="btn btn-sm btn-secondary" onclick="window.MoonshineApp.exportDataJSON()" style="flex:1;" title="Exportar respaldo JSON">
+            Respaldo
+          </button>
+          <button class="btn btn-sm btn-secondary" onclick="window.MoonshineApp.triggerImport()" style="flex:1;" title="Restaurar respaldo JSON">
+            Restaurar
+          </button>
+        </div>
+        <button class="btn btn-sm btn-secondary" onclick="window.MoonshineApp.resetToSampleData()" style="width:100%; margin-top:0.35rem;" title="Restablecer datos originales">
+          🔄 Restablecer Muestra
+        </button>
+        <input type="file" id="import-file-input" accept=".json" style="display:none;">
+        <div style="margin-top:0.5rem; font-size:0.7rem; color:#64748b; text-align:center;">
+          Moonshine Kaizen v2.2
+        </div>
+      </div>
+    </aside>
+
+    <!-- Área Principal de Contenido -->
+    <div class="main-wrapper">
+      <!-- Encabezado Superior -->
+      <header class="top-header">
+        <div class="page-heading">
+          <h1 class="page-title" id="page-title">Estación de Registro de Producción</h1>
+          <p class="page-desc" id="page-desc">Puesto de captura para operadores Moonshine</p>
+        </div>
+        
+        <div class="header-actions">
+          <!-- Indicador y Botón de Estado de Supabase Nube -->
+          <button id="btn-supabase-status" class="btn btn-secondary" onclick="window.MoonshineApp.openSupabaseModal()" title="Configuración de la Base de Datos en Supabase" style="display:inline-flex; align-items:center; gap:0.5rem;">
+            <span>☁️ Nube:</span>
+            <span id="supabase-status-badge" class="badge badge-warning">Modo Local</span>
+          </button>
+
+          <!-- Indicador de Modo -->
+          <div id="header-mode-indicator" class="mode-indicator operator-active">
+            <span>👷 Estación de Producción</span>
+          </div>
+
+          <!-- Botón de Acceso / Salida de Administrador -->
+          <button id="btn-admin-access" class="btn btn-secondary" onclick="window.MoonshineApp.openAdminAuthModal()">
+            <span>🔒 Acceso Administrador</span>
+          </button>
+
+          <button id="btn-admin-exit" class="btn btn-secondary admin-only-item" style="display:none;" onclick="window.MoonshineApp.exitAdminMode()">
+            <span>👷 Salir a Modo Estación</span>
+          </button>
+
+          <!-- Botón de Registrar Producción para Admin -->
+          <button class="btn btn-primary admin-only-item" style="display:none;" id="btn-header-quick-prod" onclick="window.MoonshineApp.openProductionModal()">
+            <span>🔨 + Lote Producción</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Cuerpo del Contenido -->
+      <main class="content-body">
+
+        <!-- ============================================== -->
+        <!-- PESTAÑA 1: MODO ESTACIÓN DE PRODUCCIÓN         -->
+        <!-- (VISTA PRINCIPAL PARA OPERADORES)              -->
+        <!-- ============================================== -->
+        <section id="tab-station" class="tab-pane active">
+          <div class="station-wrapper">
+            <div class="station-hero-card">
+              <div class="station-banner">
+                <div>
+                  <div class="station-title">
+                    <span>🔨 Registro Rápido de Producción</span>
+                  </div>
+                  <div class="station-subtitle">
+                    Seleccione su nombre y capture las estructuras terminadas durante su turno
+                  </div>
+                </div>
+                <div class="badge badge-success" style="font-size:0.85rem; padding:0.4rem 0.8rem;">
+                  Consumo Automático BOM Activo
+                </div>
+              </div>
+
+              <div class="station-body">
+                <div class="station-instruction-box">
+                  <span style="font-size:1.3rem;">ℹ️</span>
+                  <div>
+                    Al confirmar, el sistema descontará automáticamente los perfiles, láminas, uniones y tornillería del almacén general según la receta asignada a cada estructura.
+                  </div>
+                </div>
+
+                <form id="form-station-production">
+                  <div class="form-row">
+                    <!-- Dropdown de Nombre del Operador -->
+                    <div class="form-group" style="flex:2;">
+                      <label class="form-label" for="op-operator-select">
+                        Nombre del Operador <span class="req">*</span>
+                      </label>
+                      <select id="op-operator-select" class="form-control station-select-lg" required>
+                        <!-- Llenado dinámicamente con Josue Gomez, etc. -->
+                      </select>
+                    </div>
+
+                    <!-- Fecha -->
+                    <div class="form-group" style="flex:1;">
+                      <label class="form-label" for="op-prod-date">
+                        Fecha <span class="req">*</span>
+                      </label>
+                      <input type="date" id="op-prod-date" class="form-control station-select-lg" required>
+                    </div>
+
+                    <!-- Turno -->
+                    <div class="form-group" style="flex:1;">
+                      <label class="form-label" for="op-prod-shift">
+                        Turno <span class="req">*</span>
+                      </label>
+                      <select id="op-prod-shift" class="form-control station-select-lg" required>
+                        <option value="Turno 1 (Matutino)">Turno 1 (06:00 - 14:00)</option>
+                        <option value="Turno 2 (Vespertino)" selected>Turno 2 (14:00 - 22:00)</option>
+                        <option value="Turno 3 (Nocturno)">Turno 3 (22:00 - 06:00)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-row" style="margin-top:0.5rem;">
+                    <!-- Estructura Producida -->
+                    <div class="form-group" style="flex:3;">
+                      <label class="form-label" for="op-prod-structure">
+                        Estructura Fabricada <span class="req">*</span>
+                      </label>
+                      <select id="op-prod-structure" class="form-control station-select-lg" required>
+                        <!-- Nombres limpios: Trash Bin, Cart, Shadow Board, etc. -->
+                      </select>
+                    </div>
+
+                    <!-- Cantidad Producida -->
+                    <div class="form-group" style="flex:1;">
+                      <label class="form-label" for="op-prod-quantity">
+                        Cantidad (pzas) <span class="req">*</span>
+                      </label>
+                      <input type="number" id="op-prod-quantity" class="form-control station-qty-input" min="1" step="1" value="1" required>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="op-prod-notes">Notas / Orden de Trabajo (Opcional)</label>
+                    <input type="text" id="op-prod-notes" class="form-control" placeholder="Ej. Lote ensamblado para línea de ensamble final">
+                  </div>
+
+                  <!-- Mensaje de Escasez (Sin revelar costos ni fórmulas internas) -->
+                  <div id="op-shortage-alert" class="alert-item critical" style="display:none; margin-bottom:1.25rem;">
+                  </div>
+
+                  <button type="submit" id="btn-station-submit" class="btn btn-primary btn-lg" style="width:100%; padding:0.9rem; font-size:1.1rem;">
+                    🔨 Confirmar Producción & Descontar Inventario
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Tabla de Lotes Registrados Hoy para el Operador -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title">📋 Lotes Registrados Hoy en Planta</h3>
+                  <div class="card-desc">Histórico de piezas confirmadas en esta jornada</div>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>ID Lote</th>
+                      <th>Fecha</th>
+                      <th>Turno</th>
+                      <th>Operador</th>
+                      <th>Estructura</th>
+                      <th>Cantidad</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody id="station-recent-records-tbody">
+                    <!-- Dinámico -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- PESTAÑA 2: TABLERO (ADMINISTRADOR)             -->
+        <!-- ============================================== -->
+        <section id="tab-dashboard" class="tab-pane admin-only-item" style="display:none;">
+          
+          <!-- BARRA DE FILTRADO POR OPERADOR (DASHBOARD) -->
+          <div class="dashboard-filter-bar">
+            <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+              <span style="font-weight:700; font-size:0.9rem; color:var(--text-main); display:flex; align-items:center; gap:0.4rem;">
+                <span>👷</span> Filtrar Métricas por Operador:
+              </span>
+              <select id="dash-filter-operator" class="form-control" style="width:auto; min-width:260px; font-weight:600;" onchange="window.MoonshineApp.onDashboardOperatorFilterChange()">
+                <option value="">-- Todos los Operadores (Consolidado Planta) --</option>
+              </select>
+              <button type="button" class="btn btn-sm btn-secondary" id="btn-clear-dash-op-filter" onclick="window.MoonshineApp.clearDashboardOperatorFilter()" style="display:none;">
+                ✕ Quitar Filtro
+              </button>
+            </div>
+            <div id="dash-operator-badge-status" style="font-size:0.85rem; color:var(--text-muted);">
+              Mostrando métricas consolidadas de todo el equipo
+            </div>
+          </div>
+
+          <!-- 9 TARJETAS KPI (INCLUYE TOTAL ESTRUCTURAS Y SIN BOM COMPLETO) -->
+          <div class="stats-grid-7">
+            <!-- 1. Total Materials -->
+            <div class="stat-card">
+              <div class="stat-info">
+                <span class="stat-label">Total Materiales</span>
+                <span class="stat-value" id="kpi-total-materials">0</span>
+                <span class="stat-subtext">Materias primas activas</span>
+              </div>
+              <div class="stat-icon">📦</div>
+            </div>
+
+            <!-- 2. Total Structures Registered -->
+            <div class="stat-card">
+              <div class="stat-info">
+                <span class="stat-label">Total Estructuras</span>
+                <span class="stat-value" id="kpi-total-structures">0</span>
+                <span class="stat-subtext">Estructuras registradas</span>
+              </div>
+              <div class="stat-icon">📐</div>
+            </div>
+
+            <!-- 3. Structures Without Complete BOM -->
+            <div class="stat-card warning-card" id="kpi-incomplete-recipes-card">
+              <div class="stat-info">
+                <span class="stat-label">Sin BOM Completo</span>
+                <span class="stat-value" id="kpi-structures-incomplete" style="color:#d97706;">0</span>
+                <span class="stat-subtext">Receta preliminar / pendiente</span>
+              </div>
+              <div class="stat-icon amber">⚠️</div>
+            </div>
+
+            <!-- 4. Structures With Complete Recipe -->
+            <div class="stat-card">
+              <div class="stat-info">
+                <span class="stat-label">Recetas Completas</span>
+                <span class="stat-value" id="kpi-structures-complete" style="color:var(--success);">0</span>
+                <span class="stat-subtext">BOM validado formalmente</span>
+              </div>
+              <div class="stat-icon green">✅</div>
+            </div>
+
+            <!-- 5. Total Inventory Value -->
+            <div class="stat-card">
+              <div class="stat-info">
+                <span class="stat-label">Valor del Inventario</span>
+                <span class="stat-value" id="kpi-inventory-value">$0.00</span>
+                <span class="stat-subtext">Valuación monetaria</span>
+              </div>
+              <div class="stat-icon green">💰</div>
+            </div>
+
+            <!-- 6. Low Stock Materials -->
+            <div class="stat-card" id="kpi-low-stock-card">
+              <div class="stat-info">
+                <span class="stat-label">Bajo Stock Mínimo</span>
+                <span class="stat-value" id="kpi-low-stock">0</span>
+                <span class="stat-subtext">Existencias en riesgo</span>
+              </div>
+              <div class="stat-icon amber">⚠️</div>
+            </div>
+
+            <!-- 7. Out of Stock Materials -->
+            <div class="stat-card" id="kpi-out-stock-card">
+              <div class="stat-info">
+                <span class="stat-label">Materiales Agotados</span>
+                <span class="stat-value" id="kpi-out-stock">0</span>
+                <span class="stat-subtext">Stock = 0 (Crítico)</span>
+              </div>
+              <div class="stat-icon red">🛑</div>
+            </div>
+
+            <!-- 8. Production Today -->
+            <div class="stat-card success-card">
+              <div class="stat-info">
+                <span class="stat-label">Producción Hoy</span>
+                <span class="stat-value" id="kpi-production-today">0</span>
+                <span class="stat-subtext">Piezas armadas hoy</span>
+              </div>
+              <div class="stat-icon green">⚡</div>
+            </div>
+
+            <!-- 9. Production This Month -->
+            <div class="stat-card">
+              <div class="stat-info">
+                <span class="stat-label">Producción Este Mes</span>
+                <span class="stat-value" id="kpi-production-month">0</span>
+                <span class="stat-subtext">Piezas en el mes</span>
+              </div>
+              <div class="stat-icon">🏗️</div>
+            </div>
+          </div>
+
+          <!-- PANEL DE CONTROL DE RECETAS BOM (DASHBOARD) -->
+          <div class="card" style="margin-bottom: 1.5rem; border-left: 4px solid var(--primary);">
+            <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+              <div>
+                <h2 class="card-title">📐 Estado de Recetas (BOM) de Estructuras Moonshine</h2>
+                <div class="card-desc">Control de validación de materiales requeridos para el catálogo completo de estructuras</div>
+              </div>
+              <div style="display:flex; gap:0.5rem;">
+                <button class="btn btn-sm btn-outline-warning" onclick="window.MoonshineApp.goToStructuresTabWithFilter('incomplete')">
+                  Ver Sin BOM Completo →
+                </button>
+                <button class="btn btn-sm btn-primary" onclick="window.MoonshineApp.goToStructuresTabWithFilter('')">
+                  Ver Todas las Estructuras →
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1rem;">
+                <div style="background:var(--bg-surface); padding:1.15rem; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:0.8rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Recetas Completas</span>
+                    <span class="badge badge-success">Validado</span>
+                  </div>
+                  <div style="display:flex; align-items:baseline; gap:0.5rem; margin-top:0.4rem;">
+                    <span style="font-size:2rem; font-weight:800; color:var(--success);" id="dash-complete-recipes-count">0</span>
+                    <span style="font-size:1rem; color:var(--text-muted);" id="dash-complete-recipes-pct">(0%)</span>
+                  </div>
+                  <div style="font-size:0.775rem; color:var(--text-muted); margin-top:0.25rem;">
+                    Estructuras con BOM definitivo y validado por ingeniería.
+                  </div>
+                </div>
+
+                <div style="background:#fffbeb; padding:1.15rem; border-radius:var(--radius-sm); border:1px solid #fef3c7;">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:0.8rem; font-weight:700; color:#b45309; text-transform:uppercase;">Sin Receta Completa (BOM Temporal)</span>
+                    <span class="badge badge-warning">Pendiente</span>
+                  </div>
+                  <div style="display:flex; align-items:baseline; gap:0.5rem; margin-top:0.4rem;">
+                    <span style="font-size:2rem; font-weight:800; color:#d97706;" id="dash-incomplete-recipes-count">85</span>
+                    <span style="font-size:1rem; color:var(--text-muted);" id="dash-incomplete-recipes-pct">(100%)</span>
+                  </div>
+                  <div style="font-size:0.775rem; color:#92400e; margin-top:0.25rem;">
+                    Estructuras operando con BOM temporal preliminar (Perfil, Lámina, Tornillos, Pintura).
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECCIÓN DE ALERTAS DEL TABLERO -->
+          <div class="alerts-hub" id="dashboard-alerts-hub">
+            <!-- Alert 1: Low Stock & Critical items -->
+            <div id="alert-stock-banner" class="alert-item warning" style="display:none;">
+              <div class="alert-item-content">
+                <span class="alert-item-icon">⚠️</span>
+                <div>
+                  <div class="alert-title" id="alert-stock-title">Atención: Inventario bajo mínimos de seguridad</div>
+                  <div class="alert-desc" id="alert-stock-desc">Revise los materiales en riesgo de paro de línea.</div>
+                </div>
+              </div>
+              <button class="btn btn-sm btn-primary" onclick="document.querySelector('.nav-link[data-tab=\'materials\']').click()">
+                Ver Inventario →
+              </button>
+            </div>
+
+            <!-- Alert 2: Missing recipe materials (recipes with 0 stock materials) -->
+            <div id="alert-missing-recipe-banner" class="alert-item critical" style="display:none;">
+              <div class="alert-item-content">
+                <span class="alert-item-icon">🛑</span>
+                <div>
+                  <div class="alert-title" id="alert-missing-recipe-title">Alerta de Receta: Materia prima requerida está agotada</div>
+                  <div class="alert-desc" id="alert-missing-recipe-desc">Existen estructuras que no se pueden ensamblar porque sus componentes están en 0.</div>
+                </div>
+              </div>
+              <button class="btn btn-sm btn-danger" onclick="document.querySelector('.nav-link[data-tab=\'structures\']').click()">
+                Ver Recetas →
+              </button>
+            </div>
+
+            <!-- Alert 3: Structures without recipes -->
+            <div id="alert-norecipe-banner" class="alert-item info" style="display:none;">
+              <div class="alert-item-content">
+                <span class="alert-item-icon">ℹ️</span>
+                <div>
+                  <div class="alert-title">Estructuras Registradas sin Receta (BOM)</div>
+                  <div class="alert-desc" id="alert-norecipe-desc">Hay estructuras registradas que aún no tienen materiales configurados.</div>
+                </div>
+              </div>
+              <button class="btn btn-sm btn-secondary" onclick="document.querySelector('.nav-link[data-tab=\'structures\']').click()">
+                Configurar BOM →
+              </button>
+            </div>
+          </div>
+
+          <!-- 5 GRÁFICAS REQUERIDAS -->
+          <div class="charts-grid">
+            <!-- 1. Inventory by Category -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div>
+                  <div class="chart-title">📊 Inventario por Categoría</div>
+                  <div class="chart-subtitle">Distribución monetaria por familia de material</div>
+                </div>
+              </div>
+              <div class="chart-canvas-wrap" id="chart-inv-category">
+                <!-- Barras -->
+              </div>
+            </div>
+
+            <!-- 2. Material Consumption -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div>
+                  <div class="chart-title">📉 Consumo de Material</div>
+                  <div class="chart-subtitle">Ranking de materias primas más consumidas</div>
+                </div>
+              </div>
+              <div class="chart-canvas-wrap" id="chart-most-consumed">
+                <!-- Ranking -->
+              </div>
+            </div>
+
+            <!-- 3. Production by Structure -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div>
+                  <div class="chart-title">🏗️ Producción por Estructura</div>
+                  <div class="chart-subtitle">Total de unidades armadas por modelo</div>
+                </div>
+              </div>
+              <div class="chart-canvas-wrap" id="chart-structures-produced">
+                <!-- Barras -->
+              </div>
+            </div>
+
+            <!-- 4. Production by Operator -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div>
+                  <div class="chart-title">👷 Producción por Operador</div>
+                  <div class="chart-subtitle">Piezas armadas por cada integrante del equipo</div>
+                </div>
+              </div>
+              <div class="chart-canvas-wrap" id="chart-operator-produced">
+                <!-- Barras -->
+              </div>
+            </div>
+
+            <!-- 5. Production by Shift -->
+            <div class="chart-card" style="grid-column: 1 / -1;">
+              <div class="chart-header">
+                <div>
+                  <div class="chart-title">⏱️ Producción por Turno</div>
+                  <div class="chart-subtitle">Distribución de ensamble entre Turno 1, Turno 2 y Turno 3</div>
+                </div>
+              </div>
+              <div id="chart-production-shift">
+                <!-- Barra dividida -->
+              </div>
+            </div>
+          </div>
+
+          <!-- TABLA RESUMEN DE STOCK BAJO -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">⚠️ Monitoreo de Stock Bajo y Crítico</h2>
+                <div class="card-desc">Materiales con existencias en o por debajo del umbral de seguridad</div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Materia Prima</th>
+                    <th>Estado</th>
+                    <th>Stock Actual</th>
+                    <th>Mínimo</th>
+                    <th>Déficit</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboard-low-stock-tbody">
+                  <!-- Dinámico -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- PESTAÑA 3: LIBRO DE PRODUCCIÓN (ADMIN)         -->
+        <!-- ============================================== -->
+        <section id="tab-ledger" class="tab-pane admin-only-item" style="display:none;">
+          <div class="toolbar" style="flex-wrap: wrap; gap: 0.75rem;">
+            <div class="search-box" style="min-width: 200px; flex: 1;">
+              <span class="search-box-icon">🔍</span>
+              <input type="text" id="search-production" class="form-control" placeholder="Buscar en historial (lote, notas)...">
+            </div>
+            <div class="filter-group" style="flex-wrap: wrap; gap: 0.5rem;">
+              <select id="filter-prod-operator" class="form-control" style="width: auto;">
+                <option value="">Todos los Operadores</option>
+              </select>
+              <input type="date" id="filter-prod-date" class="form-control" style="width: auto;" title="Filtrar por fecha">
+              <select id="filter-prod-shift" class="form-control" style="width: auto;">
+                <option value="">Todos los Turnos</option>
+                <option value="Turno 1">Turno 1 (Matutino)</option>
+                <option value="Turno 2">Turno 2 (Vespertino)</option>
+                <option value="Turno 3">Turno 3 (Nocturno)</option>
+              </select>
+              <select id="filter-prod-structure" class="form-control" style="width: auto; max-width: 220px;">
+                <option value="">Todas las Estructuras</option>
+              </select>
+              <button class="btn btn-secondary btn-sm" onclick="window.MoonshineApp.resetProductionFilters()" title="Limpiar todos los filtros">
+                ✕ Limpiar
+              </button>
+              <button class="btn btn-success" onclick="window.MoonshineApp.exportProductionExcel()" style="display:inline-flex; align-items:center; gap:0.4rem; background-color:#16a34a; border-color:#16a34a; color:#fff; font-weight:600;" title="Descargar libro de Excel (.xlsx) con 3 hojas: Producción, Consumo de Materiales y Resumen Ejecutivo">
+                <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Exportar a Excel (.xlsx)
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="window.MoonshineApp.exportProductionCSV()" title="Descargar copia en CSV">
+                CSV
+              </button>
+              <button class="btn btn-primary" onclick="window.MoonshineApp.openProductionModal()">
+                + Registrar Producción
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Libro Mayor de Registros de Producción</h2>
+                <div class="card-desc">Historial completo con costos de materiales y deducción atómica de inventario</div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID Registro</th>
+                    <th>Fecha</th>
+                    <th>Turno</th>
+                    <th>Operador</th>
+                    <th>Estructura</th>
+                    <th>Cant.</th>
+                    <th>Materiales Consumidos</th>
+                    <th>Costo Lote</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="production-records-tbody">
+                  <!-- Dinámico -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- PESTAÑA 4: MATERIA PRIMA (ADMIN)               -->
+        <!-- ============================================== -->
+        <section id="tab-materials" class="tab-pane admin-only-item" style="display:none;">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="search-box-icon">🔍</span>
+              <input type="text" id="search-materials" class="form-control" placeholder="Buscar material, categoría, unidad...">
+            </div>
+            <div class="filter-group">
+              <select id="filter-mat-category" class="form-control" style="width: auto;">
+                <option value="">Todas las Categorías</option>
+              </select>
+              <select id="filter-mat-status" class="form-control" style="width: auto;">
+                <option value="">Todos los Estados</option>
+                <option value="low">Stock Bajo</option>
+                <option value="out">Agotados (Stock 0)</option>
+                <option value="ok">Stock Saludable</option>
+              </select>
+              <button class="btn btn-secondary" onclick="window.MoonshineApp.exportMaterialsCSV()">
+                Exportar CSV
+              </button>
+              <button class="btn btn-primary" onclick="window.MoonshineApp.openMaterialModal()">
+                + Agregar Materia Prima
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Catálogo Maestro de Materias Primas</h2>
+                <div class="card-desc">Existencias en almacén, umbrales de seguridad y costos unitarios</div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Materia Prima</th>
+                    <th>Categoría</th>
+                    <th>Unidad</th>
+                    <th>Stock Actual</th>
+                    <th>Mínimo</th>
+                    <th>Costo Unitario</th>
+                    <th>Valor Total</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="materials-table-tbody">
+                  <!-- Dinámico -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- PESTAÑA 5: ESTRUCTURAS & BOM (ADMIN)           -->
+        <!-- ============================================== -->
+        <section id="tab-structures" class="tab-pane admin-only-item" style="display:none;">
+          <div class="structures-filter-bar">
+            <div class="structures-filter-inputs">
+              <div style="min-width: 250px; flex: 1;">
+                <input type="text" id="search-structures" class="form-control" placeholder="🔍 Buscar estructura por nombre..." oninput="window.MoonshineApp.filterStructures()">
+              </div>
+              <div style="min-width: 190px;">
+                <select id="filter-structures-cat" class="form-control" onchange="window.MoonshineApp.filterStructures()">
+                  <option value="">Todas las Categorías</option>
+                </select>
+              </div>
+              <div style="min-width: 210px;">
+                <select id="filter-structures-status" class="form-control" onchange="window.MoonshineApp.filterStructures()">
+                  <option value="">Todos los Estados de Receta</option>
+                  <option value="complete">🟢 Receta Completa (Validada)</option>
+                  <option value="incomplete">🟡 Sin Receta Completa (BOM Temporal)</option>
+                  <option value="empty">🛑 Sin Materiales (0)</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex; gap:0.6rem; align-items:center;">
+              <span id="structures-count-badge" class="badge badge-neutral" style="font-size:0.85rem; padding:0.45rem 0.75rem;">
+                85 Estructuras
+              </span>
+              <button class="btn btn-primary" onclick="window.MoonshineApp.openStructureModal()">
+                + Nueva Estructura
+              </button>
+            </div>
+          </div>
+
+          <div class="structure-grid" id="structures-grid-container">
+            <!-- Dinámico -->
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- PESTAÑA 6: GESTIÓN DE OPERADORES (ADMIN)       -->
+        <!-- ============================================== -->
+        <section id="tab-operators" class="tab-pane admin-only-item" style="display:none;">
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">👥 Agregar Nuevo Operador al Equipo</h2>
+                <div class="card-desc">El nombre aparecerá inmediatamente en la lista desplegable de la estación de producción</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <form id="form-add-operator" style="display:flex; gap:1rem; align-items:flex-end; max-width:600px;">
+                <div style="flex:1;">
+                  <label class="form-label" for="new-operator-name">Nombre Completo del Operador <span class="req">*</span></label>
+                  <input type="text" id="new-operator-name" class="form-control" placeholder="Ej. Josue Gomez" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="white-space:nowrap;">
+                  + Guardar Operador
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Lista de Operadores Activos</h2>
+                <div class="card-desc">Personal autorizado para registrar ensambles en la estación de producción</div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Nombre del Operador</th>
+                    <th>Estatus</th>
+                    <th>Lotes Registrados</th>
+                    <th>Total Piezas Armadas</th>
+                    <th>Última Actividad</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="operators-table-tbody">
+                  <!-- Dinámico -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- PESTAÑA 7: HISTORIAL DE AUDITORÍA (ADMIN)      -->
+        <!-- ============================================== -->
+        <section id="tab-audit" class="tab-pane admin-only-item" style="display:none;">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="search-box-icon">🔍</span>
+              <input type="text" id="search-audit" class="form-control" placeholder="Buscar por operador, acción, detalle...">
+            </div>
+            <div class="filter-group">
+              <select id="filter-audit-action" class="form-control" style="width: auto;">
+                <option value="">Todas las Acciones</option>
+                <option value="Producción">Producción</option>
+                <option value="Inventario">Inventario / Ajustes</option>
+                <option value="Material">Materiales</option>
+                <option value="Receta">Recetas & Estructuras</option>
+                <option value="Operador">Operadores</option>
+                <option value="Admin">Administración</option>
+              </select>
+              <button class="btn btn-secondary" onclick="window.MoonshineApp.exportAuditCSV()">
+                Exportar Auditoría CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Historial de Auditoría y Trazabilidad</h2>
+                <div class="card-desc">Registro inmutable de ensambles registrados por operadores y modificaciones administrativas</div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Fecha y Hora</th>
+                    <th>Operador / Usuario</th>
+                    <th>Acción</th>
+                    <th>Detalles / Materiales Consumidos</th>
+                  </tr>
+                </thead>
+                <tbody id="audit-table-tbody">
+                  <!-- Dinámico -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: CÓDIGO DE ACCESO ADMINISTRADOR (4125715)-->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="modal-admin-auth">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>🔒 Acceso de Administrador</span>
+        </div>
+        <button class="modal-close" data-close-modal="modal-admin-auth">&times;</button>
+      </div>
+
+      <form id="form-admin-auth">
+        <div class="modal-body">
+          <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:1.2rem;">
+            Ingrese el código de acceso exclusivo de administración para desbloquear el tablero, inventarios, recetas y reportes:
+          </p>
+
+          <div class="form-group">
+            <label class="form-label" for="admin-code-input">Código de Acceso <span class="req">*</span></label>
+            <input type="password" id="admin-code-input" class="form-control station-select-lg" placeholder="•••••••" required autofocus>
+          </div>
+
+          <div id="admin-code-error" class="alert-item critical" style="display:none; padding:0.6rem; font-size:0.825rem; margin-bottom:1rem;">
+            ❌ Código de acceso incorrecto.
+          </div>
+
+          <div style="background-color:var(--bg-surface); padding:0.75rem; border-radius:var(--radius-sm); font-size:0.8rem; display:flex; justify-content:space-between; align-items:center;">
+            <span>Código de prueba: <strong>4125715</strong></span>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('admin-code-input').value = '4125715'; document.getElementById('admin-code-input').focus();">
+              Usar Código
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-admin-auth">Cancelar</button>
+          <button type="submit" class="btn btn-primary">
+            Desbloquear Panel →
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: REGISTRAR PRODUCCIÓN (ADMIN VIEW)       -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="modal-production">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>🔨 Registrar Producción de Estructura (Admin)</span>
+        </div>
+        <button class="modal-close" data-close-modal="modal-production">&times;</button>
+      </div>
+
+      <form id="form-production">
+        <div class="modal-body">
+          <div class="alert-item info" style="margin-bottom:1rem; padding: 0.75rem 1rem;">
+            <div class="alert-item-content" style="font-size:0.85rem;">
+              <span>ℹ️</span>
+              <div>
+                <strong>Regla de Separación:</strong> Cada estructura se almacena en su propio registro independiente.
+                El inventario de materias primas se descontará automáticamente al confirmar.
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="prod-operator-select">Nombre del Operador <span class="req">*</span></label>
+              <select id="prod-operator-select" class="form-control" required>
+                <!-- Opciones de operadores -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="prod-date">Fecha de Producción <span class="req">*</span></label>
+              <input type="date" id="prod-date" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="prod-shift">Turno <span class="req">*</span></label>
+              <select id="prod-shift" class="form-control" required>
+                <option value="Turno 1 (Matutino)">Turno 1 (06:00 - 14:00)</option>
+                <option value="Turno 2 (Vespertino)" selected>Turno 2 (14:00 - 22:00)</option>
+                <option value="Turno 3 (Nocturno)">Turno 3 (22:00 - 06:00)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="flex:2;">
+              <label class="form-label" for="prod-structure">Estructura Fabricada <span class="req">*</span></label>
+              <select id="prod-structure" class="form-control" required>
+                <!-- Dinámico -->
+              </select>
+            </div>
+
+            <div class="form-group" style="flex:1;">
+              <label class="form-label" for="prod-quantity">Cantidad Producida <span class="req">*</span></label>
+              <input type="number" id="prod-quantity" class="form-control" min="1" step="1" value="1" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="prod-notes">Notas / Orden de Trabajo (Opcional)</label>
+            <input type="text" id="prod-notes" class="form-control" placeholder="Ej. Lote ensamblado para línea de empaque">
+          </div>
+
+          <div id="prod-shortage-warning" class="alert-item critical" style="display:none; margin-top: 1rem;">
+          </div>
+
+          <div id="prod-preview-container" class="preview-box" style="display:none;">
+            <div class="preview-title">
+              <span>⚡ Cálculo Automático de Consumo de Inventario</span>
+              <span style="font-size:0.8rem; color:var(--text-muted);">Costo Estimado: <strong id="prod-preview-total-cost" style="color:var(--text-main);">$0.00</strong></span>
+            </div>
+            <table class="preview-table">
+              <thead>
+                <tr>
+                  <th>Material</th>
+                  <th>Requerido</th>
+                  <th>Stock Actual</th>
+                  <th>Stock Proyectado</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="prod-preview-table-tbody">
+                <!-- Dinámico -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-production">Cancelar</button>
+          <button type="submit" id="btn-submit-production" class="btn btn-primary">
+            Confirmar y Descontar Inventario Automáticamente
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: AGREGAR / EDITAR MATERIAL               -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="modal-material">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-material-title">Agregar Materia Prima</div>
+        <button class="modal-close" data-close-modal="modal-material">&times;</button>
+      </div>
+
+      <form id="form-material">
+        <input type="hidden" id="material-id-hidden">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="mat-name">Nombre del Material <span class="req">*</span></label>
+            <input type="text" id="mat-name" class="form-control" placeholder="Ej. Perfil de Acero 28mm" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="mat-category">Categoría <span class="req">*</span></label>
+              <input type="text" id="mat-category" class="form-control" placeholder="Ej. Perfiles y Tubos" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="mat-unit">Unidad de Medida <span class="req">*</span></label>
+              <input type="text" id="mat-unit" class="form-control" placeholder="Ej. metros, láminas, tornillos, piezas" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="mat-current-stock">Stock Actual <span class="req">*</span></label>
+              <input type="number" step="any" min="0" id="mat-current-stock" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="mat-min-stock">Stock Mínimo de Seguridad <span class="req">*</span></label>
+              <input type="number" step="any" min="0" id="mat-min-stock" class="form-control" required>
+              <div class="form-text">Genera alerta de stock bajo cuando las existencias caen a este nivel o menos</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="mat-unit-cost">Costo Unitario ($ USD) <span class="req">*</span></label>
+            <input type="number" step="0.01" min="0" id="mat-unit-cost" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-material">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Material</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: REABASTECER / AJUSTAR STOCK             -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="modal-restock">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">📦 Reabastecer o Ajustar Stock de Material</div>
+        <button class="modal-close" data-close-modal="modal-restock">&times;</button>
+      </div>
+
+      <form id="form-restock">
+        <input type="hidden" id="restock-material-id">
+        <div class="modal-body">
+          <div style="background-color:var(--bg-surface); padding:1rem; border-radius:var(--radius-sm); margin-bottom:1.25rem;">
+            <div style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase;">Materia Prima</div>
+            <div style="font-size:1.15rem; font-weight:700;" id="restock-material-name">--</div>
+            <div style="font-size:0.85rem; margin-top:0.25rem;">
+              Existencia Actual: <strong id="restock-current-stock">0</strong>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="restock-qty">
+              Cantidad a Agregar (<span id="restock-unit-label">unidades</span>) <span class="req">*</span>
+            </label>
+            <input type="number" step="any" min="0.1" id="restock-qty" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="restock-notes">Motivo / Número de Orden de Compra</label>
+            <input type="text" id="restock-notes" class="form-control" placeholder="Ej. Recepción de proveedor PO-9012 o conteo cíclico">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-restock">Cancelar</button>
+          <button type="submit" class="btn btn-success">Sumar al Inventario</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: AGREGAR / EDITAR ESTRUCTURA & BOM       -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="modal-structure">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-structure-title">Configuración de Estructura y Receta (BOM)</div>
+        <button class="modal-close" data-close-modal="modal-structure">&times;</button>
+      </div>
+
+      <form id="form-structure">
+        <input type="hidden" id="structure-id-hidden">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group" style="flex:2;">
+              <label class="form-label" for="struct-name">Nombre de la Estructura <span class="req">*</span></label>
+              <input type="text" id="struct-name" class="form-control" placeholder="Ej. FISH 8 CART, MESA CUADRADA, etc." required>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label" for="struct-category">Categoría</label>
+              <input type="text" id="struct-category" class="form-control" placeholder="Ej. Carros de Transporte (Carts)">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label" for="struct-recipe-status">Estado de la Receta</label>
+              <select id="struct-recipe-status" class="form-control">
+                <option value="incomplete">🟡 Incompleta (BOM Temporal)</option>
+                <option value="complete">🟢 Receta Completa (Validada)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="struct-description">Descripción</label>
+            <input type="text" id="struct-description" class="form-control" placeholder="Ej. Estación móvil ergonómica para recolección de desperdicios">
+          </div>
+
+          <!-- Constructor de Receta BOM -->
+          <div style="margin-top:1.5rem; padding-top:1.25rem; border-top:1px solid var(--border-color);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+              <div>
+                <strong style="font-size:0.95rem;">Receta / Lista de Materiales (BOM)</strong>
+                <div style="font-size:0.8rem; color:var(--text-muted);">Materia prima que se descontará por cada 1 unidad armada</div>
+              </div>
+              <div style="text-align:right;">
+                <span style="font-size:0.8rem; color:var(--text-muted);">Costo Unitario de Materiales: </span>
+                <strong id="builder-total-unit-cost" style="font-size:1rem; color:var(--text-main);">$0.00</strong>
+              </div>
+            </div>
+
+            <table class="preview-table" style="background:#ffffff; border:1px solid var(--border-color); border-radius:var(--radius-sm); margin-bottom:1rem;">
+              <thead>
+                <tr>
+                  <th>Materia Prima</th>
+                  <th style="width: 130px;">Cant. por Unidad</th>
+                  <th>Unidad</th>
+                  <th>Costo por Línea</th>
+                  <th style="width: 50px;">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="recipe-builder-tbody">
+                <!-- Dinámico -->
+              </tbody>
+            </table>
+
+            <div style="background-color:var(--bg-surface); padding:0.85rem; border-radius:var(--radius-sm); display:flex; gap:0.75rem; align-items:flex-end;">
+              <div style="flex:2;">
+                <label class="form-label" style="font-size:0.75rem; margin-bottom:0.25rem;">Seleccionar Materia Prima</label>
+                <select id="builder-material-select" class="form-control">
+                  <!-- Dinámico -->
+                </select>
+              </div>
+              <div style="width:130px;">
+                <label class="form-label" style="font-size:0.75rem; margin-bottom:0.25rem;">Cant. Requerida</label>
+                <input type="number" step="any" min="0.1" id="builder-material-qty" class="form-control" value="1">
+              </div>
+              <button type="button" class="btn btn-secondary" onclick="window.MoonshineApp.addRecipeIngredient()">
+                + Agregar a Receta
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center;">
+          <button type="button" class="btn btn-outline-danger" onclick="window.MoonshineApp.clearCurrentModalRecipe()" title="Vaciar todos los materiales de la receta">
+            🗑️ Vaciar Receta (BOM)
+          </button>
+          <div style="display:flex; gap:0.5rem;">
+            <button type="button" class="btn btn-secondary" data-close-modal="modal-structure">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar Estructura y Receta</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: RECIBO DE CONSUMO DE PRODUCCIÓN         -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="modal-production-details">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>🧾 Recibo de Producción y Consumo Automático de Materiales</span>
+        </div>
+        <button class="modal-close" data-close-modal="modal-production-details">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem; background-color:var(--bg-surface); padding:1rem; border-radius:var(--radius-md); margin-bottom:1.5rem;">
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">ID de Lote</div>
+            <strong id="receipt-id">--</strong>
+          </div>
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Fecha y Turno</div>
+            <div><span id="receipt-date">--</span> | <span id="receipt-shift">--</span></div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Operador</div>
+            <strong id="receipt-employee">--</strong>
+          </div>
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Estructura Fabricada</div>
+            <strong id="receipt-structure">--</strong>
+          </div>
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Cantidad Producida</div>
+            <span class="badge badge-success" id="receipt-quantity">--</span>
+          </div>
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Costo Total en Materiales</div>
+            <strong id="receipt-total-cost" style="color:var(--primary); font-size:1.1rem;">--</strong>
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Notas</div>
+            <div id="receipt-notes" style="font-size:0.85rem;">--</div>
+          </div>
+        </div>
+
+        <h3 style="font-size:0.95rem; font-weight:700; margin-bottom:0.5rem;">Desglose de Materiales Consumidos (Deducidos de Almacén)</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Nombre del Material</th>
+              <th>Receta / Unidad</th>
+              <th>Total Deducido</th>
+              <th>Costo Unitario</th>
+              <th>Costo Total de Línea</th>
+            </tr>
+          </thead>
+          <tbody id="receipt-materials-tbody">
+            <!-- Dinámico -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-close-modal="modal-production-details">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Configuración y Sincronización con Supabase -->
+  <div class="modal-overlay" id="modal-supabase-config">
+    <div class="modal" style="max-width: 620px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>☁️ Conexión con Supabase (Base de Datos en la Nube)</span>
+        </div>
+        <button class="modal-close" data-close-modal="modal-supabase-config">&times;</button>
+      </div>
+
+      <form id="form-supabase-config">
+        <div class="modal-body">
+          <div class="alert-item info" style="margin-bottom: 1.25rem; padding: 0.85rem 1rem;">
+            <div class="alert-item-content" style="font-size: 0.85rem;">
+              <strong>¿Para qué sirve?</strong> Al conectar Supabase, los datos de producción, materiales y operadores se almacenan en un servidor seguro en la nube. Varios operadores y administradores en distintas computadoras o celulares verán y compartirán la misma información en tiempo real.
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label class="form-label" for="supabase-url">
+              URL del Proyecto en Supabase (Project URL) <span class="req">*</span>
+            </label>
+            <input type="url" id="supabase-url" class="form-control" placeholder="https://xxxxxxxxxxxxxxxxxxxx.supabase.co" required>
+            <small style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+              Encuéntrala en: <em>Supabase Dashboard &rarr; Project Settings &rarr; Configuration &rarr; API &rarr; Project URL</em>
+            </small>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label class="form-label" for="supabase-anon-key">
+              Clave Pública Anónima (Project API Key: anon / public) <span class="req">*</span>
+            </label>
+            <input type="password" id="supabase-anon-key" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required autocomplete="off">
+            <small style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+              Encuéntrala en: <em>Supabase Dashboard &rarr; Project Settings &rarr; Configuration &rarr; API &rarr; Project API keys (anon public)</em>
+            </small>
+          </div>
+
+          <div id="supabase-test-feedback" style="display:none; padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 1rem;"></div>
+
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <button type="button" id="btn-supabase-test" class="btn btn-secondary" style="font-size: 0.85rem;">
+              🧪 Probar Conexión
+            </button>
+            <button type="button" id="btn-supabase-upload-now" class="btn btn-outline-warning" style="font-size: 0.85rem;" title="Sube los datos que tienes en este navegador a la nube">
+              ⬆️ Subir Datos Locales a la Nube
+            </button>
+            <button type="button" id="btn-supabase-download-now" class="btn btn-outline-warning" style="font-size: 0.85rem;" title="Sobrescribe los datos locales con lo que haya en la nube">
+              ⬇️ Forzar Descarga de la Nube
+            </button>
+            <button type="button" id="btn-supabase-disconnect" class="btn btn-danger" style="font-size: 0.85rem; margin-left: auto;">
+              Desconectar
+            </button>
+          </div>
+
+          <div style="background-color: var(--bg-surface); padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-size: 0.8rem; color: var(--text-muted);">
+            <strong>📌 Importante:</strong> Antes de conectar, asegúrate de haber creado la tabla ejecutando el script <code>supabase_schema.sql</code> en el <em>SQL Editor</em> de Supabase.
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-supabase-config">Cerrar</button>
+          <button type="submit" class="btn btn-primary" id="btn-supabase-save">💾 Guardar y Conectar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Contenedor de Alertas Flotantes (Toasts) -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Supabase JS Client v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Integración con Supabase -->
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-db.js"></script>
+  <!-- Lógica Principal de la Aplicación -->
+  <script src="js/app.js"></script>
+</body>
+</html>

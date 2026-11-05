@@ -1,0 +1,17 @@
+# Logs y archivos del sistema operativo
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+*.log
+
+# Editores y entornos
+.vscode/
+.idea/
+*.swp
+*~
+
+# Backups temporales
+*.bak
+*.tmp
