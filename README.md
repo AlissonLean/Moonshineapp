@@ -56,6 +56,52 @@ powershell -ExecutionPolicy Bypass -File .\server.ps1
 
 ---
 
+## ☁️ Conexión con Supabase (Base de Datos en la Nube)
+
+Para que los datos de operadores, inventarios y lotes de producción se sincronicen en la nube (y no dependan únicamente del navegador local):
+
+1. **Crea tu proyecto en Supabase:**
+   - Entra a [https://supabase.com](https://supabase.com) y crea una cuenta gratuita.
+   - Crea un nuevo proyecto (ej. `moonshine-db`).
+2. **Crea las tablas en Supabase:**
+   - En el menú lateral izquierdo ve a **SQL Editor**.
+   - Haz clic en **New query**, copia y pega el contenido de [supabase_schema.sql](file:///C:/Users/gdlgemro/OneDrive%20-%20Flex/Documents/Moonshineapp/supabase_schema.sql) y pulsa **Run**.
+3. **Copia tus credenciales:**
+   - En Supabase ve a **Project Settings** (icono de engranaje) &rarr; **API**.
+   - Copia la **Project URL** (`https://xxxxxxxx.supabase.co`).
+   - Copia la **Project API key (anon / public)**.
+4. **Conecta la aplicación:**
+   - Abre la app, haz clic en el botón superior **☁️ Nube: Modo Local**.
+   - Pega tu URL y tu clave anónima y pulsa **💾 Guardar y Conectar**.
+   - ¡Listo! Los datos ahora se sincronizan en tiempo real entre todos los usuarios.
+
+---
+
+## 🌐 Publicación en la Nube con GitHub y GitHub Pages
+
+Para tener la aplicación en línea con un enlace público accesible desde cualquier computadora o celular:
+
+1. **Crea un repositorio en GitHub:**
+   - Entra a [https://github.com/new](https://github.com/new).
+   - Nómbralo (ejemplo: `Moonshineapp`).
+   - Puedes dejarlo **Público** o **Privado**.
+   - No marques inicializar con README ni `.gitignore` (ya están creados localmente).
+   - Haz clic en **Create repository**.
+2. **Sube tu código desde tu terminal:**
+   ```powershell
+   git remote add origin https://github.com/<TU_USUARIO>/Moonshineapp.git
+   git branch -M main
+   git push -u origin main
+   ```
+3. **Activa GitHub Pages:**
+   - En la página de tu repositorio en GitHub, ve a **Settings** &rarr; pestaña **Pages**.
+   - En **Build and deployment &rarr; Branch**, selecciona `main` y la carpeta `/ (root)`.
+   - Haz clic en **Save**.
+   - En 1 o 2 minutos, GitHub te entregará tu enlace web público:
+     `https://<TU_USUARIO>.github.io/Moonshineapp/`
+
+---
+
 ## 🏗️ Catálogo de 85 Estructuras Reales de Moonshine
 
 El sistema incluye las 85 estructuras oficiales pre-cargadas con recetas temporales preliminares:
