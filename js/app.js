@@ -3544,35 +3544,9 @@
 
     const fileInput = document.getElementById('import-file-input');
     if (fileInput) fileInput.addEventListener('change', importDataJSON);
-
-    // Eventos de Integración con Supabase
-    const formSupabase = document.getElementById('form-supabase-config');
-    if (formSupabase) {
-      formSupabase.addEventListener('submit', handleSupabaseSaveSubmit);
-    }
-
-    const btnTestSupabase = document.getElementById('btn-supabase-test');
-    if (btnTestSupabase) {
-      btnTestSupabase.addEventListener('click', handleSupabaseTestClick);
-    }
-
-    const btnUploadSupabase = document.getElementById('btn-supabase-upload-now');
-    if (btnUploadSupabase) {
-      btnUploadSupabase.addEventListener('click', handleSupabaseUploadClick);
-    }
-
-    const btnDownloadSupabase = document.getElementById('btn-supabase-download-now');
-    if (btnDownloadSupabase) {
-      btnDownloadSupabase.addEventListener('click', handleSupabaseDownloadClick);
-    }
-
-    const btnDisconnectSupabase = document.getElementById('btn-supabase-disconnect');
-    if (btnDisconnectSupabase) {
-      btnDisconnectSupabase.addEventListener('click', handleSupabaseDisconnectClick);
-    }
   }
 
-  // Sincronización Remota con Supabase
+  // Sincronización Automática en la Nube con Supabase
   function applyRemoteState(remoteData, notify = false) {
     if (!remoteData || typeof remoteData !== 'object') return;
 
@@ -3600,7 +3574,6 @@
     if (!window.MoonshineSupabase) return;
 
     if (!window.MoonshineSupabase.isConfigured()) {
-      window.MoonshineSupabase.updateBadge('Modo Local', 'badge-warning', 'Operando sin sincronización remota');
       return;
     }
 
@@ -3626,165 +3599,6 @@
     }
   }
 
-  function openSupabaseModal() {
-    const modal = document.getElementById('modal-supabase-config');
-    if (!modal) return;
-
-    const feedback = document.getElementById('supabase-test-feedback');
-    if (feedback) feedback.style.display = 'none';
-
-    const cfg = window.MoonshineSupabase ? window.MoonshineSupabase.getConfig() : { url: '', anonKey: '' };
-    const urlInput = document.getElementById('supabase-url');
-    const keyInput = document.getElementById('supabase-anon-key');
-
-    if (urlInput) urlInput.value = cfg.url || '';
-    if (keyInput) keyInput.value = cfg.anonKey || '';
-
-    modal.classList.add('active');
-  }
-
-  async function handleSupabaseSaveSubmit(e) {
-    e.preventDefault();
-    const url = document.getElementById('supabase-url')?.value.trim();
-    const key = document.getElementById('supabase-anon-key')?.value.trim();
-    const feedback = document.getElementById('supabase-test-feedback');
-
-    if (!window.MoonshineSupabase) return;
-
-    try {
-      if (feedback) {
-        feedback.style.display = 'block';
-        feedback.style.backgroundColor = 'var(--info-bg)';
-        feedback.style.color = '#075985';
-        feedback.textContent = '⏳ Verificando credenciales y conectando...';
-      }
-
-      await window.MoonshineSupabase.testConnection(url, key);
-      window.MoonshineSupabase.setConfig(url, key);
-
-      // Sincronizar inmediatamente
-      await initSupabaseSync();
-
-      if (feedback) {
-        feedback.style.backgroundColor = 'var(--success-bg)';
-        feedback.style.color = '#065f46';
-        feedback.textContent = '✅ Conexión establecida con éxito y datos sincronizados.';
-      }
-
-      showToast('Supabase conectado correctamente. Los datos ahora se sincronizan en la nube.', 'success', 'Nube Conectada');
-      setTimeout(() => closeModal('modal-supabase-config'), 1000);
-    } catch (err) {
-      if (feedback) {
-        feedback.style.backgroundColor = 'var(--danger-bg)';
-        feedback.style.color = '#991b1b';
-        feedback.textContent = `❌ ${err.message || 'Error al conectar'}`;
-      }
-      showToast(err.message || 'Error al conectar con Supabase', 'danger', 'Fallo de Conexión');
-    }
-  }
-
-  async function handleSupabaseTestClick() {
-    const url = document.getElementById('supabase-url')?.value.trim();
-    const key = document.getElementById('supabase-anon-key')?.value.trim();
-    const feedback = document.getElementById('supabase-test-feedback');
-
-    if (!window.MoonshineSupabase) return;
-
-    try {
-      if (feedback) {
-        feedback.style.display = 'block';
-        feedback.style.backgroundColor = 'var(--info-bg)';
-        feedback.style.color = '#075985';
-        feedback.textContent = '⏳ Probando conexión con Supabase...';
-      }
-
-      await window.MoonshineSupabase.testConnection(url, key);
-
-      // Guardar y activar la conexión de inmediato para que no se quede en "Modo Local"
-      window.MoonshineSupabase.setConfig(url, key);
-      await initSupabaseSync();
-
-      if (feedback) {
-        feedback.style.backgroundColor = 'var(--success-bg)';
-        feedback.style.color = '#065f46';
-        feedback.textContent = '✅ ¡Conexión exitosa y activada! Tus credenciales quedaron guardadas y el indicador cambió a Nube Activa.';
-      }
-      showToast('Conectado a Supabase con éxito.', 'success', 'Nube Activa');
-    } catch (err) {
-      if (feedback) {
-        feedback.style.display = 'block';
-        feedback.style.backgroundColor = 'var(--danger-bg)';
-        feedback.style.color = '#991b1b';
-        feedback.textContent = `❌ ${err.message || 'Error al conectar'}`;
-      }
-      showToast(err.message || 'Error al conectar con Supabase', 'danger', 'Fallo de Conexión');
-    }
-  }
-
-  async function handleSupabaseUploadClick() {
-    if (!window.MoonshineSupabase || !window.MoonshineSupabase.isConfigured()) {
-      alert('Debes configurar y conectar Supabase primero.');
-      return;
-    }
-
-    if (!confirm('¿Deseas subir todos los datos actuales de este navegador a Supabase? Esto sobrescribirá el estado en la nube.')) {
-      return;
-    }
-
-    try {
-      await window.MoonshineSupabase.saveRemoteState(state, true);
-      showToast('Datos locales subidos exitosamente a Supabase.', 'success', 'Nube Actualizada');
-      logAudit('Admin', 'Subió manualmente los datos locales a la base de datos Supabase');
-    } catch (e) {
-      showToast('No se pudieron subir los datos a Supabase: ' + e.message, 'danger');
-    }
-  }
-
-  async function handleSupabaseDownloadClick() {
-    if (!window.MoonshineSupabase || !window.MoonshineSupabase.isConfigured()) {
-      alert('Debes configurar y conectar Supabase primero.');
-      return;
-    }
-
-    if (!confirm('¿Deseas descargar el estado desde Supabase? Los datos que no estén en la nube se sobrescribirán en este navegador.')) {
-      return;
-    }
-
-    try {
-      const remote = await window.MoonshineSupabase.fetchRemoteState();
-      if (remote) {
-        applyRemoteState(remote, false);
-        showToast('Datos descargados exitosamente desde la nube Supabase.', 'success', 'Sincronizado');
-        logAudit('Admin', 'Descargó manualmente los datos desde la nube Supabase');
-      } else {
-        alert('No se encontraron datos previos en la base de datos de Supabase.');
-      }
-    } catch (e) {
-      showToast('Error al descargar datos de Supabase: ' + e.message, 'danger');
-    }
-  }
-
-  function handleSupabaseDisconnectClick() {
-    if (!confirm('¿Deseas desconectar Supabase? La aplicación continuará funcionando en Modo Local (guardando solo en este navegador).')) {
-      return;
-    }
-
-    if (window.MoonshineSupabase) {
-      window.MoonshineSupabase.clearConfig();
-    }
-
-    const urlInput = document.getElementById('supabase-url');
-    const keyInput = document.getElementById('supabase-anon-key');
-    if (urlInput) urlInput.value = '';
-    if (keyInput) keyInput.value = '';
-
-    const feedback = document.getElementById('supabase-test-feedback');
-    if (feedback) feedback.style.display = 'none';
-
-    showToast('Supabase desconectado. Aplicación en Modo Local.', 'warning', 'Desconectado');
-    closeModal('modal-supabase-config');
-  }
-
   // Arranque
   function init() {
     loadState();
@@ -3803,7 +3617,7 @@
       switchTab('station');
     }
 
-    // Iniciar sincronización con Supabase (si está configurado)
+    // Iniciar sincronización transparente con Supabase
     initSupabaseSync();
   }
 
@@ -3849,7 +3663,6 @@
     exportMaterialsCSV: exportMaterialsCSV,
     exportAuditCSV: exportAuditCSV,
     triggerImport: () => document.getElementById('import-file-input')?.click(),
-    openSupabaseModal: () => openSupabaseModal(),
     closeModal: (id) => closeModal(id)
   };
 
