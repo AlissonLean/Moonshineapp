@@ -3700,11 +3700,16 @@
 
       await window.MoonshineSupabase.testConnection(url, key);
 
+      // Guardar y activar la conexión de inmediato para que no se quede en "Modo Local"
+      window.MoonshineSupabase.setConfig(url, key);
+      await initSupabaseSync();
+
       if (feedback) {
         feedback.style.backgroundColor = 'var(--success-bg)';
         feedback.style.color = '#065f46';
-        feedback.textContent = '✅ ¡Conexión exitosa! Las credenciales y la tabla "moonshine_state" son válidas.';
+        feedback.textContent = '✅ ¡Conexión exitosa y activada! Tus credenciales quedaron guardadas y el indicador cambió a Nube Activa.';
       }
+      showToast('Conectado a Supabase con éxito.', 'success', 'Nube Activa');
     } catch (err) {
       if (feedback) {
         feedback.style.display = 'block';
@@ -3712,6 +3717,7 @@
         feedback.style.color = '#991b1b';
         feedback.textContent = `❌ ${err.message || 'Error al conectar'}`;
       }
+      showToast(err.message || 'Error al conectar con Supabase', 'danger', 'Fallo de Conexión');
     }
   }
 
